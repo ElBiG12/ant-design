@@ -10,6 +10,8 @@ import type {
 import { ConfigContext } from '../config-provider';
 import SizeContext, { SizeType } from '../config-provider/SizeContext';
 
+import useStyle from './style';
+
 export type { SegmentedValue } from 'rc-segmented';
 
 export interface SegmentedLabeledOption extends RcSegmentedLabeledOption {
@@ -37,6 +39,8 @@ const Segmented = React.forwardRef<HTMLDivElement, SegmentedProps>((props, ref) 
 
   const { getPrefixCls, direction } = React.useContext(ConfigContext);
   const prefixCls = getPrefixCls('segmented', customizePrefixCls);
+  // Style
+  const [wrapSSR, hashId] = useStyle(prefixCls);
 
   // ===================== Size =====================
   const size = React.useContext(SizeContext);
@@ -63,19 +67,23 @@ const Segmented = React.forwardRef<HTMLDivElement, SegmentedProps>((props, ref) 
     [options, prefixCls],
   );
 
-  return (
+  return wrapSSR(
     <RcSegmented
       {...restProps}
-      className={classNames(className, {
-        [`${prefixCls}-block`]: block,
-        [`${prefixCls}-sm`]: mergedSize === 'small',
-        [`${prefixCls}-lg`]: mergedSize === 'large',
-      })}
+      className={classNames(
+        className,
+        {
+          [`${prefixCls}-block`]: block,
+          [`${prefixCls}-sm`]: mergedSize === 'small',
+          [`${prefixCls}-lg`]: mergedSize === 'large',
+        },
+        hashId,
+      )}
       options={extendedOptions}
       ref={ref}
       prefixCls={prefixCls}
       direction={direction}
-    />
+    />,
   );
 });
 
